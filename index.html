@@ -1,0 +1,2831 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EDEN SEARCH — 「つくりたい」から、技術と出会う。</title>
+    <meta
+      name="description"
+      content="EDEN SEARCHは、世界中に公開されているオープンな技術（OSS・API・ライブラリ・AI）を、「何をつくりたいか」から探し、理解し、次の創造につなげるための検索・発見プラットフォームです。"
+    />
+    <meta property="og:title" content="EDEN SEARCH — 「つくりたい」から、技術と出会う。" />
+    <meta
+      property="og:description"
+      content="世界中のオープンソースを、あなたの「つくりたい」から探す。エンジニアだけでなく、すべての創りたい人のための検索エンジン。"
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts: Noto Sans JP (Primary) & Poppins (Secondary/Branding) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Three.js import map -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+      }
+    }
+    </script>
+
+    <style>
+      /* ==================================================
+         1. BASE VARIABLES & RESETS (MONOCHROME PALETTE)
+         ================================================== */
+      :root {
+        --bg: #000000;
+        --text-primary: #FFFFFF;
+        --text-secondary: rgba(255, 255, 255, 0.55);
+        --text-tertiary: rgba(255, 255, 255, 0.32);
+        --border: rgba(255, 255, 255, 0.20);
+        --border-subtle: rgba(255, 255, 255, 0.10);
+        --border-bright: rgba(255, 255, 255, 0.85);
+
+        --font-ja: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-en: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        background-color: var(--bg);
+        color: var(--text-primary);
+        font-family: var(--font-ja);
+        font-size: 16px;
+        scroll-behavior: smooth;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+      }
+
+      body {
+        background-color: var(--bg);
+        color: var(--text-primary);
+        line-height: 1.85;
+        letter-spacing: 0.025em;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      ::selection {
+        background-color: #FFFFFF;
+        color: #000000;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      /* Structural Layout Containers */
+      .container {
+        width: 100%;
+        max-width: 1360px;
+        margin: 0 auto;
+        padding: 0 4vw;
+      }
+
+      .container-narrow {
+        width: 100%;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 0 4vw;
+      }
+
+      /* Section Label Kickers (Japanese First, English Second) */
+      .section-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 0.82rem;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        margin-bottom: 2.4rem;
+      }
+
+      .section-label .en-sub {
+        font-family: var(--font-en);
+        font-size: 0.72rem;
+        color: var(--text-tertiary);
+        letter-spacing: 0.22em;
+      }
+
+      .hairline {
+        width: 100%;
+        height: 1px;
+        background-color: var(--border);
+        border: none;
+      }
+
+      /* ==================================================
+         2. NAVIGATION
+         ================================================== */
+      .site-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2rem 4vw;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 100%);
+      }
+
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        font-family: var(--font-en);
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-primary);
+      }
+
+      .brand-icon {
+        width: 22px;
+        height: 22px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .brand-icon svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 2.6rem;
+        list-style: none;
+      }
+
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav-link {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        font-size: 0.88rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        color: var(--text-secondary);
+        transition: color 0.25s ease;
+        position: relative;
+        padding: 0.2rem 0;
+      }
+
+      .nav-link .nav-en {
+        font-family: var(--font-en);
+        font-size: 0.62rem;
+        font-weight: 400;
+        letter-spacing: 0.2em;
+        color: var(--text-tertiary);
+        transition: color 0.25s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: var(--text-primary);
+      }
+
+      .nav-link:hover .nav-en,
+      .nav-link.active .nav-en {
+        color: var(--text-secondary);
+      }
+
+      .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: var(--text-primary);
+      }
+
+      /* ==================================================
+         3. HERO SECTION WITH 3D GLASS APPLE
+         ================================================== */
+      .hero-section {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        min-height: 750px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--bg);
+        user-select: none;
+      }
+
+      /* Background Huge Branding Typography */
+      .hero-background-typography {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none;
+        z-index: 1;
+        padding: 0 4vw;
+      }
+
+      .hero-bg-word {
+        font-family: var(--font-en);
+        font-size: clamp(5.5rem, 16vw, 17rem);
+        font-weight: 800;
+        line-height: 0.85;
+        letter-spacing: -0.05em;
+        text-transform: uppercase;
+        color: #FFFFFF;
+        text-align: center;
+        width: 100%;
+      }
+
+      /* Three.js Interactive WebGL Canvas */
+      .hero-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        cursor: grab;
+      }
+
+      .hero-canvas:active {
+        cursor: grabbing;
+      }
+
+      /* Foreground Japanese Primary Message */
+      .hero-content-overlay {
+        position: absolute;
+        bottom: 4.5rem;
+        left: 0;
+        width: 100%;
+        padding: 0 4vw;
+        z-index: 3;
+        pointer-events: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+
+      .hero-ja-statement {
+        max-width: 620px;
+      }
+
+      .hero-main-title {
+        font-size: clamp(2rem, 3.8vw, 3.8rem);
+        font-weight: 700;
+        line-height: 1.25;
+        letter-spacing: 0.02em;
+        color: var(--text-primary);
+        margin-bottom: 1.2rem;
+      }
+
+      .hero-subtitle {
+        font-size: clamp(1rem, 1.35vw, 1.35rem);
+        font-weight: 400;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        margin-bottom: 0.6rem;
+      }
+
+      .hero-en-tagline {
+        font-family: var(--font-en);
+        font-size: 0.8rem;
+        font-weight: 400;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-tertiary);
+      }
+
+      .hero-drag-prompt {
+        font-family: var(--font-en);
+        font-size: 0.72rem;
+        font-weight: 500;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.85rem;
+        pointer-events: auto;
+      }
+
+      .hero-drag-prompt svg {
+        width: 15px;
+        height: 15px;
+      }
+
+      /* WebGL Fallback */
+      .webgl-fallback {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(380px, 80vw);
+        height: min(380px, 80vw);
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.02);
+        z-index: 2;
+        pointer-events: none;
+      }
+
+      /* ==================================================
+         4. EDITORIAL SECTIONS COMMON STYLING
+         ================================================== */
+      .editorial-section {
+        position: relative;
+        padding: 13rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .headline-large {
+        font-size: clamp(2.2rem, 4.2vw, 4.4rem);
+        font-weight: 700;
+        line-height: 1.25;
+        letter-spacing: -0.01em;
+        color: var(--text-primary);
+        margin-bottom: 2.8rem;
+      }
+
+      .paragraph-lead {
+        font-size: clamp(1.15rem, 1.55vw, 1.45rem);
+        font-weight: 400;
+        line-height: 1.85;
+        color: var(--text-primary);
+        margin-bottom: 2rem;
+      }
+
+      .paragraph-body {
+        font-size: 1.05rem;
+        font-weight: 400;
+        line-height: 1.95;
+        color: var(--text-secondary);
+        margin-bottom: 1.6rem;
+      }
+
+      /* Two column editorial layout */
+      .split-layout {
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 6vw;
+        align-items: start;
+      }
+
+      /* Callout Quote / Mission Accent */
+      .mission-callout {
+        margin-top: 3.2rem;
+        padding: 2rem 0 2rem 2.4rem;
+        border-left: 2px solid var(--text-primary);
+      }
+
+      .callout-lead {
+        font-size: 0.76rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        margin-bottom: 0.6rem;
+      }
+
+      .callout-text {
+        font-size: clamp(1.2rem, 1.7vw, 1.6rem);
+        font-weight: 600;
+        line-height: 1.5;
+        color: var(--text-primary);
+      }
+
+      /* Jargon Explanation Card / Inline definition */
+      .term-glossary-box {
+        margin-top: 3.5rem;
+        padding: 2.5rem;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.015);
+      }
+
+      .glossary-title {
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-primary);
+        margin-bottom: 1.2rem;
+      }
+
+      .glossary-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        list-style: none;
+      }
+
+      .glossary-item {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 1.5rem;
+        font-size: 0.95rem;
+        line-height: 1.7;
+      }
+
+      .glossary-term {
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .glossary-desc {
+        color: var(--text-secondary);
+      }
+
+      /* ==================================================
+         5. SECTION 03: WHAT CAN YOU FIND (EXPLORE GRID)
+         ================================================== */
+      .category-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border-top: 1px solid var(--border);
+        border-left: 1px solid var(--border);
+      }
+
+      .category-cell {
+        position: relative;
+        padding: 3.2rem 2.5rem;
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 230px;
+        transition: border-color 0.3s ease, background-color 0.3s ease;
+        cursor: default;
+      }
+
+      .category-cell::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-color: #FFFFFF;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+
+      .category-cell:hover {
+        border-color: var(--border-bright);
+        z-index: 2;
+      }
+
+      .category-cell:hover::before {
+        opacity: 0.025;
+      }
+
+      .cat-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 3rem;
+      }
+
+      .cat-number {
+        font-family: var(--font-en);
+        font-size: 0.72rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        color: var(--text-secondary);
+      }
+
+      .cat-arrow {
+        font-size: 1.1rem;
+        color: var(--text-primary);
+        opacity: 0;
+        transform: translateX(-6px);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+      }
+
+      .category-cell:hover .cat-arrow {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .cat-body {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        transition: transform 0.25s ease;
+      }
+
+      .category-cell:hover .cat-body {
+        transform: translateX(6px);
+      }
+
+      .cat-title-ja {
+        font-size: 1.35rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--text-primary);
+      }
+
+      .cat-title-en {
+        font-family: var(--font-en);
+        font-size: 0.72rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+      }
+
+      .cat-examples {
+        font-size: 0.85rem;
+        color: var(--text-tertiary);
+        margin-top: 0.5rem;
+        line-height: 1.5;
+      }
+
+      /* ==================================================
+         6. SECTION 04: SEARCH BY IDEA (CONCRETE QUERIES)
+         ================================================== */
+      .query-manifesto-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin: 4rem 0 5rem 0;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .query-manifesto-item {
+        padding: 2.2rem 0;
+        border-bottom: 1px solid var(--border-subtle);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: padding-left 0.3s ease, border-color 0.3s ease;
+      }
+
+      .query-manifesto-item:last-child {
+        border-bottom: none;
+      }
+
+      .query-manifesto-item:hover {
+        padding-left: 1.2rem;
+        border-color: var(--border);
+      }
+
+      .query-text {
+        font-size: clamp(1.35rem, 2.5vw, 2.5rem);
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        color: var(--text-primary);
+      }
+
+      .query-intent {
+        font-family: var(--font-en);
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+      }
+
+      .versus-panel {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4vw;
+        padding: 3rem;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.015);
+      }
+
+      .versus-col h4 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        margin-bottom: 1.2rem;
+      }
+
+      .versus-col p {
+        font-size: 1.05rem;
+        line-height: 1.8;
+      }
+
+      /* ==================================================
+         7. SECTION 05 & 06: INFORMATION ARCHITECTURE & RESULT DEMO
+         ================================================== */
+      .questions-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.4rem;
+        margin: 3.5rem 0 5rem 0;
+      }
+
+      .question-card {
+        padding: 1.6rem 1.4rem;
+        border: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 110px;
+        transition: border-color 0.25s ease;
+      }
+
+      .question-card:hover {
+        border-color: var(--border-bright);
+      }
+
+      .q-num {
+        font-family: var(--font-en);
+        font-size: 0.68rem;
+        letter-spacing: 0.16em;
+        color: var(--text-tertiary);
+      }
+
+      .q-title {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      /* Search Result Architectural Demo */
+      .result-specimen-wrap {
+        border: 1px solid var(--border);
+        padding: 4rem;
+        background: rgba(255, 255, 255, 0.01);
+        margin-top: 4rem;
+      }
+
+      .specimen-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 2.5rem;
+      }
+
+      .specimen-name {
+        font-family: var(--font-en);
+        font-size: clamp(2.2rem, 3.8vw, 3.8rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+      }
+
+      .specimen-badge {
+        font-family: var(--font-en);
+        font-size: 0.72rem;
+        letter-spacing: 0.18em;
+        padding: 0.4rem 0.9rem;
+        border: 1px solid var(--border);
+        text-transform: uppercase;
+        color: var(--text-secondary);
+      }
+
+      .specimen-desc {
+        font-size: 1.35rem;
+        font-weight: 500;
+        line-height: 1.6;
+        color: var(--text-primary);
+        margin-bottom: 3rem;
+      }
+
+      .specimen-capabilities {
+        display: grid;
+        grid-template-columns: 160px 1fr;
+        gap: 2rem;
+        padding: 2rem 0;
+        border-top: 1px solid var(--border-subtle);
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 3rem;
+      }
+
+      .cap-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+      }
+
+      .cap-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem 1.8rem;
+      }
+
+      .cap-chip {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .cap-chip::before {
+        content: '・';
+        color: var(--text-secondary);
+      }
+
+      /* Metadata Grid in Specimen */
+      .specimen-meta-matrix {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+      }
+
+      .meta-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      .meta-cell-key {
+        font-family: var(--font-en);
+        font-size: 0.68rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-tertiary);
+      }
+
+      .meta-cell-val {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      /* ==================================================
+         8. SECTION 09 & 10: THE NAME & THE APPLE
+         ================================================== */
+      .name-hero-display {
+        font-family: var(--font-en);
+        font-size: clamp(5.5rem, 18vw, 19rem);
+        font-weight: 800;
+        line-height: 0.82;
+        letter-spacing: -0.05em;
+        text-transform: uppercase;
+        color: var(--text-primary);
+        margin: 1.5rem 0 6rem 0;
+      }
+
+      .name-columns-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .name-col {
+        padding: 4.5rem 4vw 4.5rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1.8rem;
+      }
+
+      .name-col:last-child {
+        padding-left: 4vw;
+        padding-right: 0;
+        border-left: 1px solid var(--border);
+      }
+
+      .col-title-ja {
+        font-size: clamp(1.8rem, 2.5vw, 2.6rem);
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .col-title-en {
+        font-family: var(--font-en);
+        font-size: 0.82rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        margin-top: 0.2rem;
+      }
+
+      .col-triad {
+        display: flex;
+        gap: 1.4rem;
+        font-size: 0.92rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        color: var(--text-secondary);
+      }
+
+      .name-synthesis-bar {
+        margin-top: 5rem;
+        padding: 3rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      .synthesis-label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+      }
+
+      .synthesis-quote {
+        font-size: clamp(1.4rem, 2.2vw, 2.2rem);
+        font-weight: 600;
+        line-height: 1.45;
+        color: var(--text-primary);
+      }
+
+      /* Apple Section */
+      .apple-manifesto-box {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 6vw;
+        align-items: center;
+        padding: 6rem 0;
+      }
+
+      .apple-concepts-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.8rem;
+        padding: 2.5rem;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.015);
+      }
+
+      .apple-concept-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1.4rem;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+
+      .apple-concept-row:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      .concept-symbol {
+        font-family: var(--font-en);
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        color: var(--text-primary);
+      }
+
+      .concept-meaning {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+
+      /* ==================================================
+         9. SECTION 11: PHILOSOPHY (FULL SCREEN)
+         ================================================== */
+      .philosophy-section {
+        position: relative;
+        min-height: 95vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 14rem 4vw;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .philosophy-lines-box {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        margin-bottom: 4rem;
+      }
+
+      .phil-line {
+        font-size: clamp(2.8rem, 6.8vw, 6.8rem);
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+        color: var(--text-primary);
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .phil-line.revealed {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .phil-line:nth-child(1) { transition-delay: 0.1s; }
+      .phil-line:nth-child(2) { transition-delay: 0.25s; }
+      .phil-line:nth-child(3) { transition-delay: 0.4s; }
+
+      .phil-en-sub {
+        font-family: var(--font-en);
+        font-size: clamp(0.85rem, 1.4vw, 1.4rem);
+        font-weight: 500;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        margin-bottom: 4rem;
+      }
+
+      .phil-cycle {
+        display: flex;
+        align-items: center;
+        gap: 2.2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        color: var(--text-primary);
+      }
+
+      .phil-cycle span {
+        display: inline-flex;
+        align-items: center;
+        gap: 2.2rem;
+      }
+
+      .phil-cycle span::after {
+        content: '—';
+        color: var(--border);
+      }
+
+      .phil-cycle span:last-child::after {
+        content: '';
+      }
+
+      /* ==================================================
+         10. SECTION 12 & 13: EDEN IS NOT... & JOURNAL
+         ================================================== */
+      .not-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        margin: 3.5rem 0 5rem 0;
+      }
+
+      .not-card {
+        padding: 3rem 2.4rem;
+        border: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+      }
+
+      .not-tag {
+        font-family: var(--font-en);
+        font-size: 0.68rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-tertiary);
+      }
+
+      .not-heading {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .not-desc {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        line-height: 1.8;
+      }
+
+      /* Journal Section Topics Matrix */
+      .journal-topics-matrix {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border-top: 1px solid var(--border);
+        border-left: 1px solid var(--border);
+        margin-top: 3.5rem;
+      }
+
+      .journal-topic-cell {
+        padding: 2.8rem 2.2rem;
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        transition: border-color 0.25s ease;
+      }
+
+      .journal-topic-cell:hover {
+        border-color: var(--border-bright);
+      }
+
+      .topic-label {
+        font-family: var(--font-en);
+        font-size: 0.68rem;
+        letter-spacing: 0.16em;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+      }
+
+      .topic-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        line-height: 1.5;
+      }
+
+      .topic-desc {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+      }
+
+      /* ==================================================
+         11. FINAL SECTION & FOOTER
+         ================================================== */
+      .final-section {
+        position: relative;
+        min-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 14rem 4vw;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .final-title-ja {
+        font-size: clamp(3rem, 7.5vw, 7.5rem);
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+      }
+
+      .final-title-en {
+        font-family: var(--font-en);
+        font-size: clamp(0.9rem, 1.6vw, 1.6rem);
+        font-weight: 600;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        margin-bottom: 3.5rem;
+      }
+
+      .final-sub-ja {
+        font-size: clamp(1.2rem, 1.8vw, 1.6rem);
+        font-weight: 400;
+        color: var(--text-secondary);
+        margin-bottom: 4.5rem;
+      }
+
+      .btn-eden-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 1.4rem;
+        padding: 1.5rem 3.6rem;
+        background: transparent;
+        color: #FFFFFF;
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        font-family: var(--font-ja);
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        cursor: pointer;
+        transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+      }
+
+      .btn-eden-action .btn-sub-en {
+        font-family: var(--font-en);
+        font-size: 0.72rem;
+        letter-spacing: 0.2em;
+        color: var(--text-secondary);
+        transition: color 0.25s ease;
+      }
+
+      .btn-eden-action:hover {
+        background-color: #FFFFFF;
+        color: #000000;
+        border-color: #FFFFFF;
+      }
+
+      .btn-eden-action:hover .btn-sub-en {
+        color: #555555;
+      }
+
+      /* Minimal Footer */
+      .site-footer {
+        padding: 5rem 4vw;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+      }
+
+      .footer-brand {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+
+      .footer-logo {
+        font-family: var(--font-en);
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        color: var(--text-primary);
+      }
+
+      .footer-sub {
+        font-family: var(--font-en);
+        font-size: 0.68rem;
+        letter-spacing: 0.2em;
+        color: var(--text-tertiary);
+      }
+
+      .footer-mission {
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        text-align: center;
+      }
+
+      .footer-nav {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+      }
+
+      .footer-nav a:hover {
+        color: var(--text-primary);
+      }
+
+      .footer-copy {
+        font-family: var(--font-en);
+        font-size: 0.72rem;
+        letter-spacing: 0.15em;
+        color: var(--text-tertiary);
+      }
+
+      /* ==================================================
+         12. RESPONSIVE BREAKPOINTS
+         ================================================== */
+      @media (max-width: 1024px) {
+        .split-layout,
+        .apple-manifesto-box {
+          grid-template-columns: 1fr;
+          gap: 4rem;
+        }
+
+        .category-grid,
+        .journal-topics-matrix {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .questions-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .name-columns-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .name-col {
+          padding: 3.5rem 0;
+          border-left: none !important;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .not-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .specimen-meta-matrix {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .versus-panel {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .site-nav {
+          padding: 1.6rem 6vw;
+        }
+
+        .nav-links {
+          gap: 1.4rem;
+        }
+
+        .nav-link .nav-en {
+          display: none;
+        }
+
+        .editorial-section {
+          padding: 8rem 0;
+        }
+
+        .hero-content-overlay {
+          bottom: 2.5rem;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 2rem;
+        }
+
+        .hero-drag-prompt {
+          display: none;
+        }
+
+        .category-grid,
+        .journal-topics-matrix {
+          grid-template-columns: 1fr;
+        }
+
+        .questions-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .result-specimen-wrap {
+          padding: 2.2rem 1.6rem;
+        }
+
+        .specimen-capabilities {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+
+        .site-footer {
+          flex-direction: column;
+          gap: 2rem;
+          text-align: center;
+          padding: 4rem 6vw;
+        }
+
+        .footer-mission {
+          text-align: center;
+        }
+
+        .query-manifesto-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+
+        .phil-line {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ==================================================
+         TOP NAVIGATION
+         ================================================== -->
+    <header>
+      <nav class="site-nav" aria-label="主要ナビゲーション">
+        <a href="#hero" class="nav-brand">
+          <span class="brand-icon" aria-hidden="true">
+            <!-- Monochrome Minimal Botanical Knowledge Leaf/Aperture -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2C6.5 2 2 6.5 2 12c0 5 3.5 9.2 8.2 9.9.5.1 1.8.1 2.3 0 4.7-.7 8.2-4.9 8.2-9.9 0-5.5-4.5-10-8.7-10z" />
+              <path d="M12 3v18" stroke-width="1.5" stroke-dasharray="2 2" />
+              <path d="M12 7c3 1.5 5 4.5 5 7.5" />
+            </svg>
+          </span>
+          <span>EDEN SEARCH</span>
+        </a>
+
+        <ul class="nav-links">
+          <li class="nav-item">
+            <a href="#search-by-idea" class="nav-link">
+              <span>検索</span>
+              <span class="nav-en">SEARCH</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#explore" class="nav-link">
+              <span>技術を探す</span>
+              <span class="nav-en">EXPLORE</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#what-is-eden" class="nav-link active">
+              <span>EDENについて</span>
+              <span class="nav-en">ABOUT</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#journal" class="nav-link">
+              <span>記事</span>
+              <span class="nav-en">JOURNAL</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <!-- ==================================================
+           HERO SECTION WITH 3D GLASS APPLE
+           ================================================== -->
+      <section class="hero-section" id="hero" aria-label="ファーストビュー">
+        <!-- Background Architectural Branding Typography -->
+        <div class="hero-background-typography" aria-hidden="true" id="heroTextLayer">
+          <div class="hero-bg-word" id="bgWordDiscover">DISCOVER</div>
+          <div class="hero-bg-word" id="bgWordCreate">CREATE</div>
+          <div class="hero-bg-word" id="bgWordEden">EDEN</div>
+        </div>
+
+        <!-- Central Three.js Interactive Glass Apple -->
+        <canvas
+          class="hero-canvas"
+          id="heroCanvas"
+          aria-label="知恵の実を象徴する3Dガラスのリンゴ。ドラッグして回転できます。"
+        ></canvas>
+
+        <!-- Fallback if WebGL fails -->
+        <div class="webgl-fallback" id="webglFallback">
+          <p style="font-size: 0.85rem; letter-spacing: 0.12em; color: var(--text-secondary);">
+            GLASS APPLE OF KNOWLEDGE<br />
+            <span style="font-size: 0.72rem; opacity: 0.7;">知ることは、創ることの始まり。</span>
+          </p>
+        </div>
+
+        <!-- Foreground Primary Japanese Message -->
+        <div class="hero-content-overlay">
+          <div class="hero-ja-statement">
+            <h1 class="hero-main-title">
+              「つくりたい」から、<br />
+              技術と出会う。
+            </h1>
+            <p class="hero-subtitle">
+              世界中のオープンソースを、あなたの「つくりたい」から探す。
+            </p>
+            <div class="hero-en-tagline">
+              Discover the building blocks of creation.
+            </div>
+          </div>
+
+          <div class="hero-drag-prompt">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M12 2v20M17 5l-5-3-5 3M17 19l-5 3-5-3M2 12h20M5 7l-3 5 3 5M19 7l3 5-3 5" />
+            </svg>
+            <span>DRAG TO ROTATE APPLE</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           01 — EDEN SEARCHとは？ (WHAT IS EDEN SEARCH?)
+           ================================================== -->
+      <section class="editorial-section" id="what-is-eden">
+        <div class="container">
+          <div class="section-label">
+            <span>01 — EDEN SEARCHとは？</span>
+            <span class="en-sub">WHAT IS EDEN SEARCH?</span>
+          </div>
+
+          <div class="split-layout">
+            <div>
+              <h2 class="headline-large">
+                世界中の「使える技術」を、<br />
+                ひとつの場所から。
+              </h2>
+            </div>
+
+            <div>
+              <p class="paragraph-lead">
+                インターネットには、誰かがつくり、世界に公開している便利な技術が無数に存在しています。
+              </p>
+
+              <p class="paragraph-body">
+                画像を加工する技術。AIを動かす技術。3Dを表示する技術。Webサイトをつくる技術。ゲームをつくる技術。データを分析する技術。
+              </p>
+
+              <p class="paragraph-body">
+                その多くは、決められた利用条件さえ守れば誰でも自由に利用できる「オープンソース」として公開されています。
+              </p>
+
+              <p class="paragraph-body">
+                しかし現在、それらは世界中のさまざまなウェブサイトや専門データベースに分散しています。そして何より、自分が必要としている技術の「名前」をあらかじめ知っていなければ、検索することすら難しいのが現状です。
+              </p>
+
+              <div class="mission-callout">
+                <div class="callout-lead">EDEN SEARCHの目的</div>
+                <div class="callout-text">
+                  技術の「名前」ではなく、<br />
+                  「何をしたいか」から探せる場所をつくること。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           02 — オープンソースとは？ (OPEN SOURCE)
+           ================================================== -->
+      <section class="editorial-section" id="open-source">
+        <div class="container">
+          <div class="section-label">
+            <span>02 — オープンソースとは？</span>
+            <span class="en-sub">OPEN SOURCE</span>
+          </div>
+
+          <div class="split-layout">
+            <div>
+              <h2 class="headline-large">
+                誰かが公開した技術が、<br />
+                誰かの新しい創造につながる。
+              </h2>
+            </div>
+
+            <div>
+              <p class="paragraph-lead">
+                オープンソース（OSS）とは、プログラムの中身である「ソースコード」が一般に公開され、決められたルールの範囲内で、誰でも利用・改良・再配布などができるソフトウェアのことです。
+              </p>
+
+              <p class="paragraph-body">
+                世界中の個人開発者、企業、大学の研究者、国際的なコミュニティによって、現代のテクノロジーの基盤となる膨大な技術がオープンソースとして公開され続けています。
+              </p>
+
+              <p class="paragraph-body">
+                ただし、「誰でも無料で見られるから何にでも無制限に使える」という意味ではありません。プロジェクトごとに、使い方の約束事である「ライセンス」という利用条件が設定されています。
+              </p>
+
+              <!-- Jargon Glossary Box for Beginners -->
+              <div class="term-glossary-box">
+                <div class="glossary-title">初めての方へ：よく使われる言葉の意味</div>
+                <ul class="glossary-list">
+                  <li class="glossary-item">
+                    <span class="glossary-term">OSS（オープンソース）</span>
+                    <span class="glossary-desc">設計図（ソースコード）が公開され、誰でも中身を確認したり活用できるソフトウェア。</span>
+                  </li>
+                  <li class="glossary-item">
+                    <span class="glossary-term">ライセンス（利用規約）</span>
+                    <span class="glossary-desc">「商用利用して良いか」「作った人の名前を書く必要があるか」などの利用ルール。</span>
+                  </li>
+                  <li class="glossary-item">
+                    <span class="glossary-term">ライブラリ / ツール</span>
+                    <span class="glossary-desc">特定の便利な機能（画像処理や計算など）を、自分の作品に組み込んで再利用できる部品。</span>
+                  </li>
+                  <li class="glossary-item">
+                    <span class="glossary-term">API（エーピーアイ）</span>
+                    <span class="glossary-desc">外部の便利な機能やデータ（地図や翻訳など）を、別のプログラムから呼び出して連携する仕組み。</span>
+                  </li>
+                  <li class="glossary-item">
+                    <span class="glossary-term">リポジトリ</span>
+                    <span class="glossary-desc">プログラムの設計図や更新履歴が保管・公開されているインターネット上の保管庫（GitHubなど）。</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div style="margin-top: 2rem;">
+                <p class="paragraph-body">
+                  商用利用できるもの、改変が自由なもの、クレジット表記が必要なもの。EDEN SEARCHでは、こうした専門的な利用条件も、初めての方に分かりやすく整理して提示します。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           03 — 何を探せる？ (EXPLORE GRID)
+           ================================================== -->
+      <section class="editorial-section" id="explore">
+        <div class="container">
+          <div class="section-label">
+            <span>03 — 何を探せる？</span>
+            <span class="en-sub">EXPLORE</span>
+          </div>
+
+          <div style="margin-bottom: 4rem;">
+            <h2 class="headline-large">あらゆる分野の公開技術を、<br />体系的にインデックス。</h2>
+            <p class="paragraph-body" style="max-width: 680px;">
+              世界中に存在するソフトウェア資産を14の主要領域から網羅。各カテゴリには、初心者から専門家まで活用できる多彩なツールが揃っています。
+            </p>
+          </div>
+
+          <div class="category-grid">
+            <!-- 01 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">01 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">AI・機械学習</div>
+                <div class="cat-title-en">AI / MACHINE LEARNING</div>
+                <div class="cat-examples">画像認識・自然言語処理・音声生成・自前で動かせるAIモデル</div>
+              </div>
+            </div>
+
+            <!-- 02 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">02 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">Web制作</div>
+                <div class="cat-title-en">WEB DEVELOPMENT</div>
+                <div class="cat-examples">Webサイト・UIフレームワーク・アニメーション・デザインシステム</div>
+              </div>
+            </div>
+
+            <!-- 03 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">03 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">画像・映像</div>
+                <div class="cat-title-en">IMAGE / VIDEO</div>
+                <div class="cat-examples">動画エンコード・画像フィルター・背景切り抜き・メディア変換</div>
+              </div>
+            </div>
+
+            <!-- 04 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">04 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">3D・CG</div>
+                <div class="cat-title-en">3D / GRAPHICS</div>
+                <div class="cat-examples">3Dモデル描画・WebGL・レンダリングエンジン・シェーダー</div>
+              </div>
+            </div>
+
+            <!-- 05 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">05 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">ゲーム開発</div>
+                <div class="cat-title-en">GAME DEVELOPMENT</div>
+                <div class="cat-examples">2D/3Dゲームエンジン・物理演算・衝突判定・サウンド制御</div>
+              </div>
+            </div>
+
+            <!-- 06 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">06 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">XR・VR・AR</div>
+                <div class="cat-title-en">XR / VR / AR</div>
+                <div class="cat-examples">空間コンピューティング・ブラウザVR・ARマーカー認識</div>
+              </div>
+            </div>
+
+            <!-- 07 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">07 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">音声・音楽</div>
+                <div class="cat-title-en">AUDIO / MUSIC</div>
+                <div class="cat-examples">音声認識・シンセサイザー・波形解析・ノイズキャンセリング</div>
+              </div>
+            </div>
+
+            <!-- 08 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">08 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">データ分析</div>
+                <div class="cat-title-en">DATA</div>
+                <div class="cat-examples">グラフ可視化・統計計算・データ変換・スクレイピング</div>
+              </div>
+            </div>
+
+            <!-- 09 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">09 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">データベース</div>
+                <div class="cat-title-en">DATABASE</div>
+                <div class="cat-examples">データ保存・全文検索エンジン・キャッシュ・キーバリューストア</div>
+              </div>
+            </div>
+
+            <!-- 10 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">10 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">サーバー・インフラ</div>
+                <div class="cat-title-en">INFRASTRUCTURE</div>
+                <div class="cat-examples">コンテナ・クラウド自動化・Webサーバー・ネットワーク制御</div>
+              </div>
+            </div>
+
+            <!-- 11 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">11 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">開発支援ツール</div>
+                <div class="cat-title-en">DEVELOPER TOOLS</div>
+                <div class="cat-examples">コード自動整形・エラー検査・テスト自動化・ビルドシステム</div>
+              </div>
+            </div>
+
+            <!-- 12 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">12 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">ライブラリ</div>
+                <div class="cat-title-en">LIBRARIES</div>
+                <div class="cat-examples">日付処理・数学計算・UIパーツ集・暗号化など便利な再利用部品</div>
+              </div>
+            </div>
+
+            <!-- 13 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">13 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">API</div>
+                <div class="cat-title-en">APIs</div>
+                <div class="cat-examples">地図データ連携・気象情報・決済通信・外部サービス接続規約</div>
+              </div>
+            </div>
+
+            <!-- 14 -->
+            <div class="category-cell">
+              <div class="cat-head">
+                <span class="cat-number">14 / ARCHIVE</span>
+                <span class="cat-arrow" aria-hidden="true">→</span>
+              </div>
+              <div class="cat-body">
+                <div class="cat-title-ja">クリエイティブコーディング</div>
+                <div class="cat-title-en">CREATIVE CODING</div>
+                <div class="cat-examples">ジェネラティブアート・音と映像のインタラクション・インスタレーション</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           04 — 「やりたいこと」から探す (SEARCH BY IDEA)
+           ================================================== -->
+      <section class="editorial-section" id="search-by-idea">
+        <div class="container">
+          <div class="section-label">
+            <span>04 — 「やりたいこと」から探す</span>
+            <span class="en-sub">SEARCH BY IDEA</span>
+          </div>
+
+          <div>
+            <h2 class="headline-large">
+              名前を知らなくても、<br />
+              探せる検索へ。
+            </h2>
+            <p class="paragraph-lead" style="max-width: 780px;">
+              たとえば、以下のような日常の言葉やアイデアをそのまま入力してください。EDEN SEARCHが目的の技術へ導きます。
+            </p>
+          </div>
+
+          <!-- Large Concrete Query List -->
+          <div class="query-manifesto-list">
+            <div class="query-manifesto-item">
+              <div class="query-text">「写真から3Dモデルを作りたい」</div>
+              <div class="query-intent">PHOTO TO 3D / PHOTOGRAMMETRY</div>
+            </div>
+
+            <div class="query-manifesto-item">
+              <div class="query-text">「動画の背景を自動で消したい」</div>
+              <div class="query-intent">VIDEO MATTING / BACKGROUND REMOVAL</div>
+            </div>
+
+            <div class="query-manifesto-item">
+              <div class="query-text">「無料で使える音声認識を探したい」</div>
+              <div class="query-intent">SPEECH-TO-TEXT / WHISPER MODELS</div>
+            </div>
+
+            <div class="query-manifesto-item">
+              <div class="query-text">「Webサイトで3Dを表示したい」</div>
+              <div class="query-intent">WEBGL / THREE.JS / 3D CANVAS</div>
+            </div>
+
+            <div class="query-manifesto-item">
+              <div class="query-text">「商用利用できる画像生成AIを探したい」</div>
+              <div class="query-intent">COMMERCIAL DIFFUSION MODELS</div>
+            </div>
+
+            <div class="query-manifesto-item">
+              <div class="query-text">「ゲームに物理演算を入れたい」</div>
+              <div class="query-intent">RIGID BODY / PHYSICS ENGINE</div>
+            </div>
+
+            <div class="query-manifesto-item">
+              <div class="query-text">「自分のPCだけでAIを動かしたい」</div>
+              <div class="query-intent">LOCAL LLM / ON-DEVICE INFERENCE</div>
+            </div>
+          </div>
+
+          <!-- Comparison Panel: Traditional vs EDEN -->
+          <div class="versus-panel">
+            <div class="versus-col">
+              <h4>従来の技術検索</h4>
+              <p class="paragraph-body">
+                これまでの検索では、「Three.js」「OpenCV」「FFmpeg」「PyTorch」といった、専門的な固有名詞を最初から知っていることが前提でした。名前を知らなければ、検索窓に何を入れればいいか分かりません。
+              </p>
+            </div>
+            <div class="versus-col">
+              <h4>EDEN SEARCHが目指すもの</h4>
+              <p class="paragraph-body" style="color: var(--text-primary);">
+                「何を使えばいいか全く分からない」という出発点から探せる検索体験です。やりたいアイデアや作ってみたいものを言葉にするだけで、世界中の候補が見つかり、比較できます。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           05 — 見つけたあとも、わかりやすく。 (UNDERSTAND)
+           ================================================== -->
+      <section class="editorial-section" id="understand">
+        <div class="container">
+          <div class="section-label">
+            <span>05 — 見つけたあとも、わかりやすく。</span>
+            <span class="en-sub">UNDERSTAND</span>
+          </div>
+
+          <div class="split-layout">
+            <div>
+              <h2 class="headline-large">
+                専門用語の壁を取り払い、<br />
+                「結局、何に使えるか」を。
+              </h2>
+            </div>
+            <div>
+              <p class="paragraph-lead">
+                技術のページを開いても、英語の難しいドキュメントや専門用語ばかりでは、自分に使えるものなのか判断できません。
+              </p>
+              <p class="paragraph-body">
+                EDEN SEARCHは、技術を発見したあとの「理解」にも徹底的に寄り添います。技術者向けの説明をそのまま並べるのではなく、誰にとっても判断しやすい14の視点で情報を整理します。
+              </p>
+            </div>
+          </div>
+
+          <!-- 14 Questions Grid -->
+          <div class="questions-grid">
+            <div class="question-card">
+              <span class="q-num">01 / CONCEPT</span>
+              <span class="q-title">これは何？</span>
+            </div>
+            <div class="question-card">
+              <span class="q-num">02 / CAPABILITY</span>
+              <span class="q-title">何ができる？</span>
+            </div>
+            <div class="question-card">
+              <span class="q-num">03 / AUDIENCE</span>
+              <span class="q-title">どんな人向け？</span>
+            </div>
+            <div class="question-card">
+              <span class="q-num">04 / PRICING</span>
+              <span class="q-title">無料？</span>
+            </div>
+            <div class="question-card">
+              <span class="q-num">05 / COMMERCE</span>
+              <span class="q-title">商用利用できる？</span>
+            </div>
+            <div class="question-card">
+              <span class="q-num">06 / LICENSE</span>
+              <span class="q-title">ライセンスは？</span>
+            </div>
+            <div class="question-card">
+              <span class="q-num">07 / LANGUAGE</span>
+              <span class="q-title">どのプログラミング言語？</span>
+            </div>
+            <div class="question-card">
+              <span class="q-num">08 / OS SUPPORT</span>
+              <span class="q-title">Win / Mac / Linuxで動く？</span>
+            </div>
+            <div class="question-card">
+              <span class="q-num">09 / WEB COMPATIBLE</span>
+              <span class="q-title">Webブラウザで動く？</span>
+            </div>
+            <div class="question-card">
+              <span class="q-num">10 / ACTIVITY</span>
+              <span class="q-title">最近も更新されている？</span>
+            </div>
+            <div class="question-card">
+              <span class="q-num">11 / LEVEL</span>
+              <span class="q-title">初心者でも使える？</span>
+            </div>
+            <div class="question-card">
+              <span class="q-num">12 / OFFICIAL SITE</span>
+              <span class="q-title">公式サイトは？</span>
+            </div>
+            <div class="question-card">
+              <span class="q-num">13 / CODE SOURCE</span>
+              <span class="q-title">GitHubソースコードは？</span>
+            </div>
+            <div class="question-card">
+              <span class="q-num">14 / SIMILAR TECH</span>
+              <span class="q-title">似ている他の技術は？</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           06 — 検索結果のイメージ (SEARCH RESULT CONCEPT)
+           ================================================== -->
+      <section class="editorial-section" id="result-concept">
+        <div class="container">
+          <div class="section-label">
+            <span>06 — 検索結果のイメージ</span>
+            <span class="en-sub">SEARCH RESULT SPECIMEN</span>
+          </div>
+
+          <div>
+            <h2 class="headline-large">
+              ひと目で要点がわかる、<br />
+              技術のカルテ。
+            </h2>
+            <p class="paragraph-body" style="max-width: 680px;">
+              ダッシュボードのような複雑な画面ではなく、デジタルアーカイブの収蔵品目録のように美しく、必要な条件が直感的に把握できるレイアウトを提示します。
+            </p>
+          </div>
+
+          <!-- Architectural Specimen: OpenCV Example -->
+          <div class="result-specimen-wrap">
+            <div class="specimen-header">
+              <div>
+                <span style="font-family: var(--font-en); font-size: 0.72rem; letter-spacing: 0.2em; color: var(--text-tertiary); display: block; margin-bottom: 0.4rem;">
+                  SPECIMEN // INDEX 00382
+                </span>
+                <h3 class="specimen-name">OpenCV</h3>
+              </div>
+              <span class="specimen-badge">OPEN SOURCE / OSS</span>
+            </div>
+
+            <p class="specimen-desc">
+              画像や映像をコンピューターで高度に処理・認識するためのオープンソースライブラリ。
+            </p>
+
+            <div class="specimen-capabilities">
+              <div class="cap-label">できること</div>
+              <div class="cap-chips">
+                <span class="cap-chip">画像の加工・フィルター</span>
+                <span class="cap-chip">顔・物体の自動検出</span>
+                <span class="cap-chip">カメラ映像のリアルタイム処理</span>
+                <span class="cap-chip">高精度な画像解析・輪郭抽出</span>
+              </div>
+            </div>
+
+            <!-- Structured Metadata Matrix -->
+            <div class="specimen-meta-matrix">
+              <div class="meta-cell">
+                <span class="meta-cell-key">COMMERCIAL USE</span>
+                <span class="meta-cell-val">商用利用可能（Apache 2.0）</span>
+              </div>
+              <div class="meta-cell">
+                <span class="meta-cell-key">LANGUAGE</span>
+                <span class="meta-cell-val">Python / C++ / JavaScript</span>
+              </div>
+              <div class="meta-cell">
+                <span class="meta-cell-key">PLATFORM</span>
+                <span class="meta-cell-val">Windows / macOS / Linux / Web</span>
+              </div>
+              <div class="meta-cell">
+                <span class="meta-cell-key">UPDATED</span>
+                <span class="meta-cell-val">今週更新あり（高アクティブ）</span>
+              </div>
+              <div class="meta-cell">
+                <span class="meta-cell-key">BEGINNER FRIENDLY</span>
+                <span class="meta-cell-val">入門チュートリアル豊富</span>
+              </div>
+              <div class="meta-cell">
+                <span class="meta-cell-key">OFFICIAL</span>
+                <span class="meta-cell-val">opencv.org ↗</span>
+              </div>
+              <div class="meta-cell">
+                <span class="meta-cell-key">SOURCE CODE</span>
+                <span class="meta-cell-val">GitHub (77k+ Stars) ↗</span>
+              </div>
+              <div class="meta-cell">
+                <span class="meta-cell-key">SIMILAR ALTERNATIVES</span>
+                <span class="meta-cell-val">Pillow / scikit-image / MediaPipe</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           07 — なぜ必要なのか (WHY EDEN?)
+           ================================================== -->
+      <section class="editorial-section" id="why-eden">
+        <div class="container">
+          <div class="section-label">
+            <span>07 — なぜ必要なのか</span>
+            <span class="en-sub">WHY EDEN?</span>
+          </div>
+
+          <div class="split-layout">
+            <div>
+              <h2 class="headline-large">
+                技術は存在している。<br />
+                でも、見つけられない。
+              </h2>
+            </div>
+            <div>
+              <p class="paragraph-lead">
+                世界には、すでに誰かがつくった素晴らしい技術が毎日のように生み出され、公開されています。
+              </p>
+              <p class="paragraph-body">
+                しかしそれらは、GitHub、各プログラミング言語のパッケージ管理サイト、大学や研究機関の論文、企業の開発ブログ、個人のポートフォリオなど、無数の場所に散り散りに存在しています。
+              </p>
+              <p class="paragraph-body">
+                さらに、書かれている説明の多くは「すでにプログラミングを深く知っている人」向けに書かれており、別の分野のクリエイターやこれから学びたい人には、何が書いてあるのか読み解くことすら困難です。
+              </p>
+              <div class="mission-callout">
+                <div class="callout-lead">EDEN SEARCHの存在意義</div>
+                <div class="callout-text">
+                  「優れた技術が存在している場所」と、<br />
+                  「それを必要としている人」の間をつなぐこと。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           08 — 誰のためのEDEN？ (FOR EVERY CREATOR)
+           ================================================== -->
+      <section class="editorial-section" id="for-every-creator">
+        <div class="container">
+          <div class="section-label">
+            <span>08 — 誰のためのEDEN？</span>
+            <span class="en-sub">FOR EVERY CREATOR</span>
+          </div>
+
+          <div class="split-layout">
+            <div>
+              <h2 class="headline-large">
+                エンジニアだけの<br />
+                場所ではありません。
+              </h2>
+            </div>
+
+            <div>
+              <p class="paragraph-lead">
+                プログラマー。デザイナー。映像制作者。3Dアーティスト。研究者。学生。クリエイター。起業家。そして、これから新しく何かをつくってみたい人。
+              </p>
+
+              <p class="paragraph-body">
+                専門的なプログラム言語を深く知らなくても、「こんな面白いものをつくってみたい」「この作業を自動化したい」というアイデアさえあれば、誰でも技術の種を見つけることができます。
+              </p>
+
+              <div class="mission-callout">
+                <div class="callout-lead">CREATION FIRST</div>
+                <div class="callout-text">
+                  技術を知っている人だけの検索エンジンではない。<br />
+                  「創りたい人」みんなのための検索エンジンです。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           09 — EDENという名前 (THE NAME)
+           ================================================== -->
+      <section class="editorial-section" id="the-name">
+        <div class="container">
+          <div class="section-label">
+            <span>09 — EDENという名前</span>
+            <span class="en-sub">THE NAME</span>
+          </div>
+
+          <div class="name-hero-display">EDEN</div>
+
+          <div class="name-columns-grid">
+            <!-- Left: Garden of Eden -->
+            <div class="name-col">
+              <div>
+                <div class="col-title-ja">エデンの園</div>
+                <div class="col-title-en">GARDEN OF EDEN</div>
+              </div>
+              <div class="col-triad">
+                <span>はじまり</span>
+                <span>/</span>
+                <span>知識</span>
+                <span>/</span>
+                <span>創造</span>
+              </div>
+              <p class="paragraph-body">
+                エデンの園は、人間の起源を描く物語の舞台です。
+              </p>
+              <p class="paragraph-lead" style="color: var(--text-primary);">
+                EDEN SEARCHでは、そこに実る「知恵の実」を、新しいものを生み出すための「知識」として捉えています。
+              </p>
+              <p class="paragraph-body">
+                世界中に公開された無数の技術のひとつひとつが、新しい創造につながる種（シード）になります。
+              </p>
+            </div>
+
+            <!-- Right: Ada Lovelace -->
+            <div class="name-col">
+              <div>
+                <div class="col-title-ja">エイダ・ラブレス</div>
+                <div class="col-title-en">ADA LOVELACE</div>
+              </div>
+              <div class="col-triad">
+                <span>計算</span>
+                <span>/</span>
+                <span>想像</span>
+                <span>/</span>
+                <span>創造</span>
+              </div>
+              <p class="paragraph-body">
+                19世紀、現代のコンピューターが存在するよりはるか以前に、機械が単なる計算を超えて、音楽や画像などさまざまなものを生み出せる可能性を予見した人物。世界初のプログラマーとも呼ばれています。
+              </p>
+              <p class="paragraph-lead" style="color: var(--text-primary);">
+                彼女の仕事は、論理と詩的な想像力の美しい融合でした。
+              </p>
+              <p class="paragraph-body">
+                EDENという名前には、エデンの園が象徴する「創成」と、Ada Lovelaceが象徴する「プログラミングの原点」という二つの意味を重ねています。
+              </p>
+            </div>
+          </div>
+
+          <div class="name-synthesis-bar">
+            <span class="synthesis-label">PHILOSOPHICAL AXIS</span>
+            <p class="synthesis-quote">
+              テクノロジーとは、人が何かを創造するための土台である。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           10 — 知恵の実 (THE APPLE)
+           ================================================== -->
+      <section class="editorial-section" id="the-apple">
+        <div class="container">
+          <div class="section-label">
+            <span>10 — 知恵の実</span>
+            <span class="en-sub">THE APPLE</span>
+          </div>
+
+          <div class="apple-manifesto-box">
+            <div>
+              <h2 class="headline-large">
+                知ることは、<br />
+                創ることの始まり。
+              </h2>
+              <p class="paragraph-lead">
+                EDEN SEARCHのシンボルであるリンゴは、古代から受け継がれる「知識」の象徴です。
+              </p>
+              <p class="paragraph-body">
+                透明なガラスは、すでに存在する技術を新しい視点から見つめ直すためのレンズ。その向こう側には、世界中の誰かが丹精込めて公開した知恵の結晶があります。
+              </p>
+              <p class="paragraph-body">
+                ひとつの技術と出会うことが、まだこの世界に存在しない新しい何かの始まりになるのです。
+              </p>
+            </div>
+
+            <!-- Conceptual Meaning Table -->
+            <div class="apple-concepts-list">
+              <div class="apple-concept-row">
+                <span class="concept-symbol">APPLE</span>
+                <span class="concept-meaning">知識（知恵の実）</span>
+              </div>
+              <div class="apple-concept-row">
+                <span class="concept-symbol">GLASS</span>
+                <span class="concept-meaning">発見（透明な探求）</span>
+              </div>
+              <div class="apple-concept-row">
+                <span class="concept-symbol">REFRACTION</span>
+                <span class="concept-meaning">既存の技術を新しい視点で見る</span>
+              </div>
+              <div class="apple-concept-row">
+                <span class="concept-symbol">NATURAL SILHOUETTE</span>
+                <span class="concept-meaning">欠けのない完全な果実・生命の源</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           11 — 哲学 (EDEN PHILOSOPHY)
+           ================================================== -->
+      <section class="philosophy-section" id="philosophy">
+        <div class="container">
+          <div class="philosophy-lines-box" id="philosophyLines">
+            <div class="phil-line">すべての人の</div>
+            <div class="phil-line">「つくりたい」を、</div>
+            <div class="phil-line">技術につなぐ。</div>
+          </div>
+
+          <div class="phil-en-sub">
+            HELPING EVERY CREATOR CREATE.
+          </div>
+
+          <div class="phil-cycle">
+            <span>探す（SEARCH）</span>
+            <span>知る（DISCOVER）</span>
+            <span>試す（TRY）</span>
+            <span>創る（CREATE）</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           12 — EDENではないもの (EDEN IS NOT...)
+           ================================================== -->
+      <section class="editorial-section" id="what-eden-is-not">
+        <div class="container">
+          <div class="section-label">
+            <span>12 — EDENではないもの</span>
+            <span class="en-sub">EDEN IS NOT...</span>
+          </div>
+
+          <div>
+            <h2 class="headline-large">
+              明確な立ち位置と、<br />
+              一次情報へのリスペクト。
+            </h2>
+          </div>
+
+          <div class="not-grid">
+            <div class="not-card">
+              <span class="not-tag">DISTINCTION 01</span>
+              <h3 class="not-heading">GitHubの代わりではありません。</h3>
+              <p class="not-desc">
+                コードの保管や共同編集を行うプラットフォームではなく、それら素晴らしいプロジェクトを「発見する」ための入り口です。
+              </p>
+            </div>
+
+            <div class="not-card">
+              <span class="not-tag">DISTINCTION 02</span>
+              <h3 class="not-heading">ソフトウェア配布所ではありません。</h3>
+              <p class="not-desc">
+                ファイルを勝手に再配布する場所ではありません。利用する際は、必ずプロジェクトの公式サイトや公式リポジトリへと案内します。
+              </p>
+            </div>
+
+            <div class="not-card">
+              <span class="not-tag">DISTINCTION 03</span>
+              <h3 class="not-heading">単なる人気ランキングではありません。</h3>
+              <p class="not-desc">
+                星の数や知名度だけで序列をつけるのではなく、「あなたが本当に作りたいものに合致しているか」という本質でマッチングします。
+              </p>
+            </div>
+          </div>
+
+          <div class="mission-callout" style="max-width: 820px;">
+            <div class="callout-lead">DISCOVERY COMPASS</div>
+            <div class="callout-text">
+              世界中に存在するオープンな技術と、何かを創りたい人をつなぐ「発見」のための検索エンジン。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           13 — 知るための記事 (EDEN JOURNAL)
+           ================================================== -->
+      <section class="editorial-section" id="journal">
+        <div class="container">
+          <div class="section-label">
+            <span>13 — 知るための記事</span>
+            <span class="en-sub">EDEN JOURNAL</span>
+          </div>
+
+          <div class="split-layout">
+            <div>
+              <h2 class="headline-large">
+                検索だけでは、<br />
+                技術はわからない。
+              </h2>
+            </div>
+            <div>
+              <p class="paragraph-lead">
+                技術の名前や機能のリストを眺めるだけでは、自分にどう役立つのかイメージが湧かないことがあります。
+              </p>
+              <p class="paragraph-body">
+                EDEN JOURNALでは、エンジニア以外の人にも伝わる平易で丁寧な言葉で、技術の背景や実際の活用事例、ツールの比較記事を発信していきます。
+              </p>
+            </div>
+          </div>
+
+          <div class="journal-topics-matrix">
+            <div class="journal-topic-cell">
+              <span class="topic-label">EDITORIAL // 01</span>
+              <div class="topic-title">「今週注目のオープンソース」</div>
+              <div class="topic-desc">世界で公開されたばかりの画期的な新技術を、非エンジニアにも分かりやすく要約。</div>
+            </div>
+
+            <div class="journal-topic-cell">
+              <span class="topic-label">EDITORIAL // 02</span>
+              <div class="topic-title">「○○をつくるには何を使う？」</div>
+              <div class="topic-desc">「動画編集ツールを作りたい」「Webで3Dを表示したい」など目的別のツール比較。</div>
+            </div>
+
+            <div class="journal-topic-cell">
+              <span class="topic-label">EDITORIAL // 03</span>
+              <div class="topic-title">「これだけは知っておきたいライセンス」</div>
+              <div class="topic-desc">商用利用していいの？ クレジット表記ってどうやるの？ をやさしく解説。</div>
+            </div>
+
+            <div class="journal-topic-cell">
+              <span class="topic-label">EDITORIAL // 04</span>
+              <div class="topic-title">「ゼロから始めるローカルAI」</div>
+              <div class="topic-desc">クラウドにお金を払わず、自分のパソコンだけでAIを動かすツールの選び方。</div>
+            </div>
+
+            <div class="journal-topic-cell">
+              <span class="topic-label">EDITORIAL // 05</span>
+              <div class="topic-title">「開発者の想いとプロジェクトの歴史」</div>
+              <div class="topic-desc">なぜその技術は作られ、なぜ世界中に無償で公開されたのか。技術の裏側にある物語。</div>
+            </div>
+
+            <div class="journal-topic-cell">
+              <span class="topic-label">EDITORIAL // 06</span>
+              <div class="topic-title">「クリエイターのための技術入門」</div>
+              <div class="topic-desc">デザイナーやアーティストが、コードの力を使って作品の幅を広げるためのガイド。</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           14 — FINAL CALLOUT
+           ================================================== -->
+      <section class="final-section" id="final">
+        <div class="container">
+          <h2 class="final-title-ja">
+            すべての創造には、<br />
+            始まりがある。
+          </h2>
+
+          <div class="final-title-en">
+            EVERY CREATION STARTS SOMEWHERE.
+          </div>
+
+          <p class="final-sub-ja">
+            あなたの次の「つくりたい」を、EDENから。
+          </p>
+
+          <div>
+            <button type="button" class="btn-eden-action" id="btnEnterEden" aria-label="EDENを探索する">
+              <span>EDENを探索する</span>
+              <span class="btn-sub-en">ENTER EDEN →</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ==================================================
+         FOOTER
+         ================================================== -->
+    <footer class="site-footer">
+      <div class="footer-brand">
+        <div class="footer-logo">EDEN SEARCH</div>
+        <div class="footer-sub">OPEN SOURCE DISCOVERY ENGINE</div>
+      </div>
+
+      <div class="footer-mission">
+        世界中のオープンな技術と、創りたい人をつなぐ。
+      </div>
+
+      <ul class="footer-nav">
+        <li><a href="#search-by-idea">検索</a></li>
+        <li><a href="#explore">カテゴリ</a></li>
+        <li><a href="#what-is-eden">EDENについて</a></li>
+        <li><a href="#journal">JOURNAL</a></li>
+      </ul>
+
+      <div class="footer-copy">
+        © EDEN SEARCH
+      </div>
+    </footer>
+
+    <!-- ==================================================
+         VANILLA JAVASCRIPT & THREE.JS 3D GLASS APPLE MODULE
+         ================================================== -->
+    <script type="module">
+      import * as THREE from 'three';
+
+      // ==========================================
+      // 1. SCROLL REVEAL FOR PHILOSOPHY TYPOGRAPHY
+      // ==========================================
+      const philLines = document.querySelectorAll('.phil-line');
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                philLines.forEach((line) => line.classList.add('revealed'));
+              }
+            });
+          },
+          { threshold: 0.2 }
+        );
+
+        const philSection = document.getElementById('philosophy');
+        if (philSection) observer.observe(philSection);
+      } else {
+        philLines.forEach((line) => line.classList.add('revealed'));
+      }
+
+      // Enter Eden Button scrolls smoothly to search section
+      const btnEnterEden = document.getElementById('btnEnterEden');
+      if (btnEnterEden) {
+        btnEnterEden.addEventListener('click', () => {
+          const searchSec = document.getElementById('search-by-idea');
+          if (searchSec) {
+            searchSec.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      }
+
+      // ==========================================
+      // 2. THREE.JS 3D GLASS APPLE WITH OPTICAL REFRACTION
+      // ==========================================
+      const heroContainer = document.getElementById('hero');
+      const canvas = document.getElementById('heroCanvas');
+      const fallback = document.getElementById('webglFallback');
+
+      let renderer, scene, camera, appleGroup, material;
+      let textCanvas, textCtx, textTexture;
+      let isDragging = false;
+      let lastPointerX = 0;
+      let lastPointerY = 0;
+      let velX = 0.0006;
+      let velY = 0.0014;
+      let targetTiltX = 0;
+      let targetTiltY = 0;
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion) {
+        velX = 0;
+        velY = 0;
+      }
+
+      function initGlassApple() {
+        try {
+          renderer = new THREE.WebGLRenderer({
+            canvas: canvas,
+            antialias: true,
+            alpha: true,
+            powerPreference: 'high-performance'
+          });
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+          renderer.setSize(heroContainer.clientWidth, heroContainer.clientHeight);
+          renderer.toneMapping = THREE.LinearToneMapping;
+
+          scene = new THREE.Scene();
+
+          const aspect = heroContainer.clientWidth / heroContainer.clientHeight;
+          camera = new THREE.PerspectiveCamera(40, aspect, 0.1, 100);
+          camera.position.set(0, 0, 4.8);
+
+          // 2D Canvas to capture the background typography: DISCOVER / CREATE / EDEN
+          textCanvas = document.createElement('canvas');
+          textCtx = textCanvas.getContext('2d');
+          textTexture = new THREE.CanvasTexture(textCanvas);
+          textTexture.minFilter = THREE.LinearFilter;
+          textTexture.magFilter = THREE.LinearFilter;
+          textTexture.generateMipmaps = false;
+
+          updateTextTexture();
+
+          // ==========================================
+          // MODELING THE COMPLETE NATURAL GLASS APPLE:
+          // Organic Body + Top Indentation + Short Stem + Minimal Leaf
+          // (No bitten silhouette)
+          // ==========================================
+          appleGroup = new THREE.Group();
+
+          // 1. Organic Apple Body via revolved Spline curve
+          const appleProfile = [
+            new THREE.Vector2(0.001, -1.05), // Bottom center dimple
+            new THREE.Vector2(0.22, -1.15),
+            new THREE.Vector2(0.55, -1.18),  // Bottom curve
+            new THREE.Vector2(0.92, -0.98),
+            new THREE.Vector2(1.28, -0.58),
+            new THREE.Vector2(1.48, -0.12),  // Lower-mid bulge
+            new THREE.Vector2(1.52, 0.35),   // Upper-mid widest bulge
+            new THREE.Vector2(1.36, 0.82),
+            new THREE.Vector2(1.05, 1.18),   // Shoulder
+            new THREE.Vector2(0.60, 1.34),   // Top rim
+            new THREE.Vector2(0.25, 1.22),   // Inward curve into calyx
+            new THREE.Vector2(0.06, 0.92),   // Stem basin depth
+            new THREE.Vector2(0.001, 0.82)   // Calyx center bottom
+          ];
+          const spline = new THREE.SplineCurve(appleProfile);
+          const lathePoints = spline.getPoints(72);
+          const bodyGeometry = new THREE.LatheGeometry(lathePoints, 80);
+          bodyGeometry.computeVertexNormals();
+
+          // 2. Short curved apple stem
+          const stemCurve = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(0, 0.80, 0),
+            new THREE.Vector3(0.03, 1.10, 0.02),
+            new THREE.Vector3(0.12, 1.42, 0.05),
+            new THREE.Vector3(0.22, 1.68, 0.08)
+          ]);
+          const stemGeometry = new THREE.TubeGeometry(stemCurve, 24, 0.042, 16, false);
+          stemGeometry.computeVertexNormals();
+
+          // 3. One minimal organic leaf
+          const leafShape = new THREE.Shape();
+          leafShape.moveTo(0, 0);
+          leafShape.quadraticCurveTo(0.26, 0.22, 0.52, 0.16);
+          leafShape.quadraticCurveTo(0.28, -0.06, 0, 0);
+          const leafGeometry = new THREE.ShapeGeometry(leafShape, 20);
+          leafGeometry.scale(0.85, 0.85, 0.85);
+          leafGeometry.rotateZ(0.42);
+          leafGeometry.rotateX(0.25);
+          leafGeometry.translate(0.10, 1.40, 0.04);
+          leafGeometry.computeVertexNormals();
+
+          // ==========================================
+          // OPTICAL REFRACTION & DISPERSION GLASS SHADER
+          // ==========================================
+          const vertexShader = `
+            varying vec3 vNormal;
+            varying vec3 vViewPosition;
+            varying vec3 vWorldPosition;
+
+            void main() {
+              vNormal = normalize(normalMatrix * normal);
+              vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+              vViewPosition = -mvPosition.xyz;
+              vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+              gl_Position = projectionMatrix * mvPosition;
+            }
+          `;
+
+          const fragmentShader = `
+            uniform sampler2D u_textTexture;
+            uniform vec2 u_resolution;
+            uniform float u_distortion;
+            uniform float u_dispersion;
+            uniform float u_time;
+
+            varying vec3 vNormal;
+            varying vec3 vViewPosition;
+            varying vec3 vWorldPosition;
+
+            void main() {
+              vec3 N = normalize(vNormal);
+              vec3 V = normalize(vViewPosition);
+
+              // Screen UV coordinate [0.0, 1.0]
+              vec2 screenUV = gl_FragCoord.xy / u_resolution.xy;
+
+              // Snell's Law with Chromatic Dispersion (Wavelength separation)
+              float nR = 1.50 - u_dispersion;
+              float nG = 1.50;
+              float nB = 1.50 + u_dispersion;
+
+              vec3 refrR = refract(-V, N, 1.0 / nR);
+              vec3 refrG = refract(-V, N, 1.0 / nG);
+              vec3 refrB = refract(-V, N, 1.0 / nB);
+
+              // Fallback to reflection if total internal reflection occurs
+              if (length(refrR) < 0.05) refrR = reflect(-V, N);
+              if (length(refrG) < 0.05) refrG = reflect(-V, N);
+              if (length(refrB) < 0.05) refrB = reflect(-V, N);
+
+              // Lens curvature displacement based on surface normal
+              vec2 lensCurveOffset = -N.xy * (u_distortion * 0.16);
+
+              // UV coordinates for R, G, B channels
+              vec2 uvR = screenUV + refrR.xy * (u_distortion * 0.22) + lensCurveOffset * 0.96;
+              vec2 uvG = screenUV + refrG.xy * (u_distortion * 0.22) + lensCurveOffset * 1.00;
+              vec2 uvB = screenUV + refrB.xy * (u_distortion * 0.22) + lensCurveOffset * 1.04;
+
+              uvR = clamp(uvR, vec2(0.001), vec2(0.999));
+              uvG = clamp(uvG, vec2(0.001), vec2(0.999));
+              uvB = clamp(uvB, vec2(0.001), vec2(0.999));
+
+              // Sample the background text texture
+              float sampleR = texture2D(u_textTexture, uvR).r;
+              float sampleG = texture2D(u_textTexture, uvG).g;
+              float sampleB = texture2D(u_textTexture, uvB).b;
+
+              vec3 refractedColor = vec3(sampleR, sampleG, sampleB);
+
+              // Fresnel white edge highlight
+              float NdotV = max(dot(N, V), 0.0);
+              float fresnel = pow(1.0 - NdotV, 3.0);
+
+              // Crisp white specular glints
+              vec3 light1 = normalize(vec3(0.5, 0.8, 1.0));
+              vec3 light2 = normalize(vec3(-0.6, -0.4, 0.9));
+              vec3 H1 = normalize(light1 + V);
+              vec3 H2 = normalize(light2 + V);
+              float spec1 = pow(max(dot(N, H1), 0.0), 44.0) * 0.70;
+              float spec2 = pow(max(dot(N, H2), 0.0), 64.0) * 0.40;
+              float specular = spec1 + spec2;
+
+              // Faint internal reflection
+              vec3 refl = reflect(-V, N);
+              vec2 reflUV = clamp(screenUV + refl.xy * 0.12, vec2(0.001), vec2(0.999));
+              float internalRefl = texture2D(u_textTexture, reflUV).g * 0.14 * (0.2 + fresnel * 0.8);
+
+              // Highlight colors
+              vec3 edgeHighlight = vec3(1.0) * (fresnel * 0.72);
+              vec3 specGlint = vec3(1.0) * (specular * 0.85);
+
+              // Final composite
+              vec3 finalColor = refractedColor + edgeHighlight + specGlint + vec3(internalRefl);
+
+              // Transparency alpha
+              float textPresence = max(max(sampleR, sampleG), sampleB);
+              float alpha = clamp(0.09 + fresnel * 0.78 + specular * 0.88 + textPresence * 0.94, 0.0, 1.0);
+
+              gl_FragColor = vec4(finalColor, alpha);
+            }
+          `;
+
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            uniforms: {
+              u_textTexture: { value: textTexture },
+              u_resolution: { value: new THREE.Vector2(heroContainer.clientWidth * dpr, heroContainer.clientHeight * dpr) },
+              u_distortion: { value: 0.50 },
+              u_dispersion: { value: 0.052 },
+              u_time: { value: 0.0 }
+            },
+            transparent: true,
+            depthWrite: true,
+            side: THREE.DoubleSide
+          });
+
+          // Create meshes for the glass apple sculpture
+          const bodyMesh = new THREE.Mesh(bodyGeometry, material);
+          const stemMesh = new THREE.Mesh(stemGeometry, material);
+          const leafMesh = new THREE.Mesh(leafGeometry, material);
+
+          appleGroup.add(bodyMesh);
+          appleGroup.add(stemMesh);
+          appleGroup.add(leafMesh);
+
+          // Center and initial sculptural tilt
+          appleGroup.position.set(0, -0.15, 0);
+          appleGroup.rotation.x = 0.18;
+          appleGroup.rotation.y = -0.32;
+
+          scene.add(appleGroup);
+
+          setupInteraction();
+          animate();
+        } catch (e) {
+          console.warn('WebGL initialization failed, falling back:', e);
+          if (fallback) fallback.style.display = 'flex';
+          if (canvas) canvas.style.display = 'none';
+        }
+      }
+
+      // Update offscreen 2D canvas texture with exact positions of DISCOVER / CREATE / EDEN
+      function updateTextTexture() {
+        if (!textCanvas || !textCtx || !heroContainer) return;
+
+        const w = heroContainer.clientWidth;
+        const h = heroContainer.clientHeight;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        textCanvas.width = Math.floor(w * dpr);
+        textCanvas.height = Math.floor(h * dpr);
+
+        textCtx.fillStyle = '#000000';
+        textCtx.fillRect(0, 0, textCanvas.width, textCanvas.height);
+
+        const words = [
+          document.getElementById('bgWordDiscover'),
+          document.getElementById('bgWordCreate'),
+          document.getElementById('bgWordEden')
+        ];
+
+        const heroRect = heroContainer.getBoundingClientRect();
+        textCtx.fillStyle = '#FFFFFF';
+        textCtx.textAlign = 'center';
+        textCtx.textBaseline = 'middle';
+
+        words.forEach((wordEl) => {
+          if (!wordEl) return;
+          const rect = wordEl.getBoundingClientRect();
+          const style = window.getComputedStyle(wordEl);
+          const fontSize = parseFloat(style.fontSize) * dpr;
+          const fontWeight = style.fontWeight || '800';
+
+          textCtx.font = `${fontWeight} ${fontSize}px Poppins, sans-serif`;
+
+          const x = (rect.left - heroRect.left + rect.width / 2) * dpr;
+          const y = (rect.top - heroRect.top + rect.height / 2) * dpr;
+
+          // Three.js CanvasTexture has flipY = true
+          const flippedY = textCanvas.height - y;
+
+          textCtx.fillText(wordEl.textContent.trim(), x, flippedY);
+        });
+
+        if (textTexture) textTexture.needsUpdate = true;
+      }
+
+      // Pointer dragging and inertia
+      function setupInteraction() {
+        canvas.addEventListener('pointerdown', (e) => {
+          isDragging = true;
+          lastPointerX = e.clientX;
+          lastPointerY = e.clientY;
+          velX = 0;
+          velY = 0;
+        });
+
+        window.addEventListener('pointermove', (e) => {
+          if (isDragging) {
+            const dx = e.clientX - lastPointerX;
+            const dy = e.clientY - lastPointerY;
+            lastPointerX = e.clientX;
+            lastPointerY = e.clientY;
+
+            velY = dx * 0.007;
+            velX = dy * 0.007;
+
+            appleGroup.rotation.y += velY;
+            appleGroup.rotation.x += velX;
+          } else {
+            // Subtle ambient mouse parallax
+            const nx = (e.clientX / window.innerWidth) - 0.5;
+            const ny = (e.clientY / window.innerHeight) - 0.5;
+            targetTiltX = ny * 0.22;
+            targetTiltY = nx * 0.32;
+          }
+        });
+
+        window.addEventListener('pointerup', () => {
+          isDragging = false;
+        });
+
+        window.addEventListener('pointercancel', () => {
+          isDragging = false;
+        });
+      }
+
+      // Render loop
+      let lastTime = 0;
+      function animate(time = 0) {
+        requestAnimationFrame(animate);
+
+        const delta = Math.min((time - lastTime) * 0.001, 0.1);
+        lastTime = time;
+
+        if (material && material.uniforms) {
+          material.uniforms.u_time.value = time * 0.001;
+        }
+
+        if (appleGroup) {
+          if (!isDragging && !prefersReducedMotion) {
+            // Inertia with friction damping
+            appleGroup.rotation.y += velY;
+            appleGroup.rotation.x += velX;
+
+            velX *= 0.965;
+            velY *= 0.965;
+
+            // Continuous calm ambient idle rotation
+            const targetIdleY = 0.0014;
+            const targetIdleX = 0.0004;
+            velY += (targetIdleY - velY) * 0.025;
+            velX += (targetIdleX - velX) * 0.025;
+
+            // Parallax follow
+            appleGroup.position.x += (targetTiltY * 0.25 - appleGroup.position.x) * 0.05;
+            appleGroup.position.y += (-0.15 - targetTiltX * 0.25 - appleGroup.position.y) * 0.05;
+          }
+        }
+
+        if (renderer && scene && camera) {
+          renderer.render(scene, camera);
+        }
+      }
+
+      // Responsive resize
+      function handleResize() {
+        if (!renderer || !camera || !heroContainer) return;
+        const width = heroContainer.clientWidth;
+        const height = heroContainer.clientHeight;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        camera.aspect = width / height;
+
+        // Mobile scaling to keep apple beautifully framed
+        if (appleGroup) {
+          const minDim = Math.min(width, height);
+          const baseScale = minDim < 600 ? 0.82 : 1.0;
+          appleGroup.scale.set(baseScale, baseScale, baseScale);
+        }
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(dpr);
+
+        if (material && material.uniforms) {
+          material.uniforms.u_resolution.value.set(width * dpr, height * dpr);
+        }
+
+        updateTextTexture();
+      }
+
+      window.addEventListener('resize', handleResize);
+
+      if (document.fonts) {
+        document.fonts.ready.then(() => {
+          updateTextTexture();
+        });
+      }
+
+      initGlassApple();
+    </script>
+  </body>
+</html>

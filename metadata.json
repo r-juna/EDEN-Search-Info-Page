@@ -1,0 +1,6 @@
+{
+  "name": "EDEN SEARCH",
+  "description": "Editorial platform and discovery engine dedicated exclusively to open-source software, libraries, and developer tools.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
